@@ -1,62 +1,86 @@
-// Parameter service for managing Firestore parameters
+// Simple parameter service for managing Firestore parameters
 import { db } from '../config/firebase.js';
 import { Parameter } from '../models/Parameter.js';
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where } from 'firebase/firestore';
 
-const parametersCollection = collection(db, 'parameters');
-
-// Create or update a parameter
-export const insertParameter = async (param : Parameter) => {
-  const paramRef = doc(parametersCollection, param.id);
-  const paramSnap = await getDoc(paramRef);
-  if (!paramSnap.exists()) {
-    await setDoc(paramRef, { ...param });
-  } else {
-    await updateDoc(paramRef, { ...param });
-    console.log(`Parameter with ID ${param.id} updated.`);
+// Create a new parameter
+export const createParameter = async (paramData: Partial<Parameter>) => {
+  // Check if parameter with same key already exists
+  if (paramData.parameterKey) {
+    const existingParam = await getParameterByKey(paramData.parameterKey);
+    if (existingParam) {
+      throw new Error(`Parameter with key '${paramData.parameterKey}' already exists`);
+    }
   }
-  return { ...param } as Parameter;
-}
+
+  // Add timestamps
+  paramData.createdAt = new Date();
+  paramData.updatedAt = new Date();
+    
+  // Save to database
+  const docRef = await db.collection('parameters').add(paramData);
+  
+  // Return the created parameter with ID
+  return {
+    id: docRef.id,
+    ...paramData
+  };
+};
 
 // Update parameter
 export const updateParameter = async (id: string, updates: Partial<Parameter>) => {
-  const paramRef = doc(parametersCollection, id);
-  await updateDoc(paramRef, updates);
-  const updatedSnap = await getDoc(paramRef);
-  if (updatedSnap.exists()) {
-    return { id: updatedSnap.id, ...updatedSnap.data() } as Parameter;
-  }
-  return null;
-}
+  // Add update timestamp
+  updates.updatedAt = new Date();
+  
+  // Update the document
+  await db.collection('parameters').doc(id).update(updates);
+  
+  // Get and return the updated document
+  const doc = await db.collection('parameters').doc(id).get();
+  return { id: doc.id, ...doc.data() };
+};
 
 // Get all parameters
 export const getAllParameters = async () => {
-  const paramSnap = await getDocs(parametersCollection);
-  return paramSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Parameter));
-}
+  const snapshot = await db.collection('parameters').get();
+  const parameters: Parameter[] = [];
+  
+  snapshot.forEach(doc => {
+    parameters.push({
+      id: doc.id,
+      ...doc.data()
+    } as Parameter);
+  });
+  
+  return parameters;
+};
 
 // Get parameter by key
 export const getParameterByKey = async (key: string) => {
-  const paramSnap = await getDocs(query(parametersCollection, where('parameterKey', '==', key)));
-  if (!paramSnap.empty) {
-    const docs = paramSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Parameter[];
-    return docs;
+  const snapshot = await db.collection('parameters')
+    .where('parameterKey', '==', key)
+    .get();
+  
+  if (snapshot.empty) {
+    return null;
   }
-  return null;
-}
+  
+  const doc = snapshot.docs[0];
+  return { id: doc.id, ...doc.data() };
+};
 
 // Get parameter by ID
 export const getParameterById = async (id: string) => {
-  const paramRef = doc(parametersCollection, id);
-  const paramSnap = await getDoc(paramRef);
-  if (paramSnap.exists()) {
-    return { id: paramSnap.id, ...paramSnap.data() } as Parameter;
+  const doc = await db.collection('parameters').doc(id).get();
+  
+  if (!doc.exists) {
+    return null;
   }
-  return null;
-}
+  
+  return { id: doc.id, ...doc.data() };
+};
 
 // Delete a parameter
 export const deleteParameter = async (id: string) => {
-  const paramRef = doc(parametersCollection, id);
-  await deleteDoc(paramRef);
-}
+  await db.collection('parameters').doc(id).delete();
+  return true;
+};
