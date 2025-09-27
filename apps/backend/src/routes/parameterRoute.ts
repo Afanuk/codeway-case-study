@@ -7,7 +7,7 @@ import {
   createParameter,     // Renamed from insertParameter
   updateParameter,
   deleteParameter      // Added missing route
-} from '../controllers/parameterController.js';
+} from '../controllers/parameterController';
 
 const router = express.Router();
 

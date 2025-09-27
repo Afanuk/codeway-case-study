@@ -6,6 +6,9 @@ import { sendSuccess, sendError } from '../utils/responses';
 
 // Create a new parameter
 export const createParameter = async (req: Request, res: Response) => {
+  console.log('createParameter controller called');
+  console.log('Request body:', JSON.stringify(req.body, null, 2));
+  
   try {
     const paramData: Omit<Parameter, 'id' | 'createdAt' | 'updatedAt'> = req.body;
     
@@ -27,6 +30,10 @@ export const createParameter = async (req: Request, res: Response) => {
 
 // Update a parameter
 export const updateParameter = async (req: Request, res: Response) => {
+  console.log('updateParameter controller called');
+  console.log('Parameter ID:', req.params.id);
+  console.log('Request body:', JSON.stringify(req.body, null, 2));
+  
   try {
     const id = req.params.id;
     const updates: Partial<Parameter> = req.body;
@@ -53,6 +60,8 @@ export const updateParameter = async (req: Request, res: Response) => {
 
 // Get all parameters
 export const getAllParameters = async (req: Request, res: Response) => {
+  console.log('getAllParameters controller called');
+  
   try {
     const parameters: Parameter[] = await parameterService.getAllParameters();
     sendSuccess(res, parameters, `Retrieved ${parameters.length} parameters`);
@@ -63,6 +72,9 @@ export const getAllParameters = async (req: Request, res: Response) => {
 
 // Get parameter by key
 export const getParameterByKey = async (req: Request, res: Response) => {
+  console.log('getParameterByKey controller called');
+  console.log('Parameter key:', req.params.key);
+  
   try {
     const key = req.params.key;
     
@@ -84,6 +96,9 @@ export const getParameterByKey = async (req: Request, res: Response) => {
 
 // Get parameter by ID
 export const getParameterById = async (req: Request, res: Response) => {
+  console.log('getParameterById controller called');
+  console.log('Parameter ID:', req.params.id);
+  
   try {
     const id = req.params.id;
     
@@ -105,6 +120,9 @@ export const getParameterById = async (req: Request, res: Response) => {
 
 // Delete a parameter
 export const deleteParameter = async (req: Request, res: Response) => {
+  console.log('deleteParameter controller called');
+  console.log('Parameter ID to delete:', req.params.id);
+  
   try {
     const id = req.params.id;
     

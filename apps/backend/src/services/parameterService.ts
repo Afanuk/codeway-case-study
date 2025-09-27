@@ -1,6 +1,6 @@
 // Simple parameter service for managing Firestore parameters
-import { db } from '../config/firebase.js';
-import { Parameter } from '../models/Parameter.js';
+import { db } from '../config/firebase';
+import { Parameter } from '../models/Parameter';
 
 // Create a new parameter
 export const createParameter = async (paramData: Partial<Parameter>) => {

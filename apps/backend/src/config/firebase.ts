@@ -9,14 +9,14 @@ if (getApps().length === 0) {
   app = initializeApp({
     credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      privateKey: process.env.FIREBASE_PRIVATE_KEY,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     } as ServiceAccount),
   });
-  console.log('🔥 Firebase Admin SDK initialized');
+  console.log('Firebase Admin SDK initialized');
 } else {
   app = getApps()[0];
-  console.log('🔥 Using existing Firebase Admin SDK instance');
+  console.log('Using existing Firebase Admin SDK instance');
 }
 
 // Initialize Cloud Firestore and get a reference to the service
