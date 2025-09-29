@@ -14,6 +14,7 @@ export const useAuth = () => {
     unsubscribe = onAuthStateChange((authUser) => {
       user.value = authUser
       isLoading.value = false
+      console.log('Auth state changed:', authUser)
     })
   })
 
