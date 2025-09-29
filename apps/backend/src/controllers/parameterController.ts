@@ -70,30 +70,6 @@ export const getAllParameters = async (req: Request, res: Response) => {
   }
 };
 
-// Get parameter by key
-export const getParameterByKey = async (req: Request, res: Response) => {
-  console.log('getParameterByKey controller called');
-  console.log('Parameter key:', req.params.key);
-  
-  try {
-    const key = req.params.key;
-    
-    if (!key) {
-      return sendError(res, 'Parameter key is required', 400);
-    }
-
-    const parameter = await parameterService.getParameterByKey(key);
-    
-    if (!parameter) {
-      return sendError(res, `Parameter with key '${key}' not found`, 404);
-    }
-
-    sendSuccess(res, parameter, 'Parameter retrieved successfully');
-  } catch (error: any) {
-    sendError(res, 'Failed to retrieve parameter', 500, error);
-  }
-};
-
 // Get parameter by ID
 export const getParameterById = async (req: Request, res: Response) => {
   console.log('getParameterById controller called');
@@ -118,6 +94,30 @@ export const getParameterById = async (req: Request, res: Response) => {
   }
 };
 
+// Get parameter by key
+export const getParameterByKey = async (req: Request, res: Response) => {
+  console.log('getParameterByKey controller called');
+  console.log('Parameter key:', req.params.key);
+  
+  try {
+    const key = req.params.key;
+    
+    if (!key) {
+      return sendError(res, 'Parameter key is required', 400);
+    }
+
+    const parameter = await parameterService.getParameterByKey(key);
+    
+    if (!parameter) {
+      return sendError(res, `Parameter with key '${key}' not found`, 404);
+    }
+
+    sendSuccess(res, parameter, 'Parameter retrieved successfully');
+  } catch (error: any) {
+    sendError(res, 'Failed to retrieve parameter', 500, error);
+  }
+};
+
 // Delete a parameter
 export const deleteParameter = async (req: Request, res: Response) => {
   console.log('deleteParameter controller called');
@@ -131,6 +131,7 @@ export const deleteParameter = async (req: Request, res: Response) => {
     }
 
     const deleted = await parameterService.deleteParameter(id);
+    console.log('Deleted parameter:', deleted);
     
     if (!deleted) {
       return sendError(res, `Parameter with ID '${id}' not found`, 404);

@@ -54,6 +54,17 @@ export const getAllParameters = async () => {
   return parameters;
 };
 
+// Get parameter by ID
+export const getParameterById = async (id: string) => {
+  const doc = await db.collection('parameters').doc(id).get();
+  
+  if (!doc.exists) {
+    return null;
+  }
+  
+  return { id: doc.id, ...doc.data() };
+};
+
 // Get parameter by key
 export const getParameterByKey = async (key: string) => {
   const snapshot = await db.collection('parameters')
@@ -65,17 +76,6 @@ export const getParameterByKey = async (key: string) => {
   }
   
   const doc = snapshot.docs[0];
-  return { id: doc.id, ...doc.data() };
-};
-
-// Get parameter by ID
-export const getParameterById = async (id: string) => {
-  const doc = await db.collection('parameters').doc(id).get();
-  
-  if (!doc.exists) {
-    return null;
-  }
-  
   return { id: doc.id, ...doc.data() };
 };
 
