@@ -1,6 +1,7 @@
 // Parameter service for handling parameter-related API calls
 import type { Parameter } from "../types/parameter"
 import type { ErrorResponse, ParameterResponse, ParameterListResponse } from "../types/api"
+import { useAuth } from "@/composables/useAuth";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 

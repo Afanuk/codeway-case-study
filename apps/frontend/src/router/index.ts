@@ -20,11 +20,19 @@ export const router = createRouter({
   ],
   scrollBehavior() { return { top: 0 } }
 })
-/*
+
 // Navigation guard to check authentication
-router.beforeEach((to, from, next) => {
-  const { user } = useAuth()
+router.beforeEach(async (to, from, next) => {
+  const { user, isLoading } = useAuth()
   console.log('Navigating to:', to.fullPath, 'from:', from.fullPath, 'user:', user.value)
+
+  // Wait for auth to finish loading
+  let attempts = 0
+  while (isLoading.value && attempts < 50) { // Max 2.5 seconds
+    await new Promise(resolve => setTimeout(resolve, 50))
+    attempts++
+  }
+  
   // Check if route requires authentication
   if (to.meta.requiresAuth && !user.value) {
     // Redirect to redirect page, which will then redirect to SignIn
@@ -36,4 +44,3 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
-*/

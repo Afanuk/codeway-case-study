@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
 
 const redirectTo = computed(() => route.query.redirect as string || '/')
-const isAuthRedirect = computed(() => redirectTo.value === '/SignIn')
 
-onMounted(() => {
-  // Small delay for better UX
+// Watch for changes in redirectTo and navigate accordingly
+watch(redirectTo, () => {
   setTimeout(() => {
-    router.push(redirectTo.value)
-  }, 1500)
-})
+    router.replace(redirectTo.value)  // Always use the redirect value
+  }, 750)
+}, { immediate: true })
+
+const isAuthRedirect = computed(() => redirectTo.value === '/SignIn')
 </script>
 
 <template>
