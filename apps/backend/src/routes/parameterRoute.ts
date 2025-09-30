@@ -1,22 +1,28 @@
-// Parameter routes
 import express from 'express';
+import { authenticateFirebaseToken, authenticateApiToken } from '../middleware/authenticateToken';
 import { 
-  getAllParameters, 
-  getParameterByKey, 
-  getParameterById, 
-  createParameter,     // Renamed from insertParameter
+  getAllParametersPanel, 
+  getParameterById,
+  getParameterByKey,
+  createParameter,
   updateParameter,
-  deleteParameter      // Added missing route
-} from '../controllers/parameterController';
+  deleteParameter
+} from '../controllers/parameterPanelController';
+import { getAllParametersClient } from '../controllers/parameterClientController';
 
 const router = express.Router();
 
-// CRUD operations for parameters
-router.post('/', createParameter);              // POST /api/parameters
-router.put('/:id', updateParameter);            // PUT /api/parameters/:id
-router.get('/', getAllParameters);              // GET /api/parameters  
-router.get('/:id', getParameterById);           // GET /api/parameters/:id
-router.get('/key/:key', getParameterByKey);     // GET /api/parameters/key/:key
-router.delete('/:id', deleteParameter);         // DELETE /api/parameters/:id
+// Specific routes first so that /config and /key/:key are not treated as IDs
+// Mobile client routes (API token auth)
+router.get('/config', authenticateApiToken, getAllParametersClient);
+router.get('/config/:key', authenticateApiToken, getParameterByKey);
+
+// Panel routes(Firebase auth)
+router.get('/key/:key', authenticateFirebaseToken, getParameterByKey);
+router.post('/', authenticateFirebaseToken, createParameter);              
+router.put('/:id', authenticateFirebaseToken, updateParameter);                     
+router.get('/', authenticateFirebaseToken, getAllParametersPanel);              
+router.delete('/:id', authenticateFirebaseToken, deleteParameter);
+router.get('/:id', authenticateFirebaseToken, getParameterById);  
 
 export default router;

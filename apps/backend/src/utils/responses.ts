@@ -3,15 +3,15 @@ import { Response } from 'express';
 /**
  * Send success response with standardized format
  * @param res - Express response object
- * @param data - Response data
  * @param message - Success message
  * @param statusCode - HTTP status code (default: 200)
+ * @param data - Response data
  */
 export const sendSuccess = (
   res: Response, 
-  data: any, 
   message = 'Success', 
-  statusCode = 200
+  statusCode = 200,
+  data: any
 ) => {
   return res.status(statusCode).json({
     success: true,

@@ -14,7 +14,6 @@ export const createParameter = async (paramData: Partial<Parameter>) => {
 
   // Add timestamps
   paramData.createdAt = new Date();
-  paramData.updatedAt = new Date();
     
   // Save to database
   const docRef = await db.collection('parameters').add(paramData);
@@ -40,7 +39,7 @@ export const updateParameter = async (id: string, updates: Partial<Parameter>) =
 };
 
 // Get all parameters
-export const getAllParameters = async () => {
+export const getAllParametersPanel = async () => {
   const snapshot = await db.collection('parameters').get();
   const parameters: Parameter[] = [];
   
