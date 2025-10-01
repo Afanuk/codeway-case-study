@@ -1,5 +1,12 @@
 <script setup lang="ts">
-// Router will handle component loading
+import { onBeforeUnmount } from 'vue'
+import { useAuth } from './composables/useAuth'
+
+const { cleanupAuth } = useAuth()
+
+onBeforeUnmount(() => {
+  cleanupAuth()
+})
 </script>
 
 <template>

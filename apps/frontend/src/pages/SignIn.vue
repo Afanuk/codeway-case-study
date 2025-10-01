@@ -11,24 +11,30 @@ const password = ref('')
 const isSignUp = ref(false)
 
 const handleSubmit = async () => {
+  
   if (!email.value || !password.value) {
+    console.log('Missing email or password')
     return
   }
 
   try {
     if (isSignUp.value) {
+      console.log('Attempting to register...')
       await register(email.value, password.value)
     } else {
+      console.log('Attempting to login...')
       await login(email.value, password.value)
     }
-    // Redirect to home page on successful authentication
-    router.push('/')
+    console.log('Authentication successful, redirecting...')
+    
+    router.push('/redirect?redirect=/')
   } catch (err) {
     console.error('Authentication error:', err)
   }
 }
 
 const toggleMode = () => {
+  console.log('toggleMode called, switching from', isSignUp.value ? 'Sign Up' : 'Sign In', 'to', !isSignUp.value ? 'Sign Up' : 'Sign In')
   isSignUp.value = !isSignUp.value
   error.value = null
 }
@@ -36,125 +42,206 @@ const toggleMode = () => {
 
 <template>
   <div class="sign-in-page">
-    <h1>{{ isSignUp ? 'Sign Up' : 'Sign In' }}</h1>
-    
-    <div v-if="error" class="error-message">
-      {{ error }}
-    </div>
-
-    <form @submit.prevent="handleSubmit">
-      <input 
-        v-model="email"
-        type="email" 
-        placeholder="Email" 
-        class="search-input"
-        required 
-      />
-      <input 
-        v-model="password"
-        type="password" 
-        placeholder="Password" 
-        class="search-input"
-        required
-      />
+    <div class="sign-in-container">
+      <div class="logo">
+        <img onclick="window.location.href='https://www.codeway.co/'" class="logo-icon" src="/src/assets/icon.png" alt="Logo" ></img>
+      </div>
       
-      <button 
-        type="submit" 
-        class="submit-button primary"
-        :disabled="isLoading"
-      >
-        {{ isLoading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In') }}
-      </button>
-    </form>
+      <h2>{{ isSignUp ? 'Create Account' : 'Please sign in' }}</h2>
+      
+      <div v-if="error" class="error-message">
+        {{ error }}
+      </div>
 
-    <button 
-      @click="toggleMode"
-      class="submit-button secondary"
-      type="button"
-    >
-      {{ isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up' }}
-    </button>
+      <form @submit.prevent="handleSubmit" class="sign-in-form">
+        <input 
+          v-model="email"
+          type="email" 
+          placeholder="E-mail address" 
+          class="form-input form-input-email"
+          required 
+        />
+        <input 
+          v-model="password"
+          type="password" 
+          placeholder="Password" 
+          class="form-input form-input-password"
+          required
+        />
+        
+        <button 
+          type="submit" 
+          class="sign-in-button"
+          :disabled="isLoading"
+        >
+          {{ isLoading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign in') }}
+        </button>
+      </form>
+
+      <button 
+        @click="toggleMode"
+        class="toggle-button"
+        type="button"
+      >
+        {{ isSignUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up' }}
+      </button>
+
+      <div class="footer">
+        Codeway © 2021
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .sign-in-page {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, #1a1930 0%, #161524 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 1rem;
 }
 
-.sign-in-page h1 {
+.sign-in-container {
+  padding: clamp(1.5rem, 5vw, 3rem);
+  width: 90%;
+  max-width: 25rem;
+  min-width: 17.5rem;
   text-align: center;
-  color: #333;
+  margin-top: -10%;
+}
+
+.logo {
   margin-bottom: 2rem;
 }
 
-.error-message {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #f5c6cb;
-}
-
-.search-input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-  box-sizing: border-box;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.submit-button {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
+.logo-icon {
+  width: 15rem;
+  height: 9.2rem;
+  border-radius: 1rem;
+  margin: 0 auto;
+  position: relative;
+  max-width: 100%;
+  transition: transform 0.3s ease;
   cursor: pointer;
-  transition: background-color 0.2s;
 }
 
-.submit-button.primary {
-  background-color: #007bff;
+.logo-icon:hover {
+  animation: wave 2s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(0px);
+  }
+  75% {
+    transform: translateY(-4px);
+  }
+}
+
+
+h2 {
+  color: rgb(70, 61, 112);
+  margin-bottom: 1rem;
+  font-weight: 400;
+  font-size: 1.5rem;
+}
+
+.error-message {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  border: 0.0625rem solid rgba(239, 68, 68, 0.2);
+}
+
+.sign-in-form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.form-input {
+  background:none;
+  border: 0.0625rem solid rgb(70, 61, 112);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 0;
+  color: #ffffff;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.form-input-email {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.form-input-password {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-bottom: 1rem;
+}
+
+.form-input::placeholder {
+  color: #6b7280;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #b32ca7;  
+}
+
+.sign-in-button {
+  background: linear-gradient(45deg, #265299 0%, #4271bd 100%);
   color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
 }
 
-.submit-button.primary:hover:not(:disabled) {
-  background-color: #0056b3;
+.sign-in-button:hover:not(:disabled) {
+  background: linear-gradient(45deg, #1a3d75 0%, #265299 100%);
 }
 
-.submit-button.primary:disabled {
-  background-color: #6c757d;
+.sign-in-button:disabled {
+  background: #6b7280;
   cursor: not-allowed;
 }
 
-.submit-button.secondary {
-  background-color: transparent;
-  color: #007bff;
-  border: 1px solid #007bff;
+.toggle-button {
+  background: transparent;
+  color: #3b82f6;
+  border: 0.0625rem solid #3b82f6;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 2rem;
+  width: 100%;
 }
 
-.submit-button.secondary:hover {
-  background-color: #007bff;
+.toggle-button:hover {
+  background: #3b82f6;
   color: white;
 }
 
-.submit-button:last-child {
-  margin-bottom: 0;
+.footer {
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 </style>
