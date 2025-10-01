@@ -8,14 +8,14 @@ import {
   updateParameter,
   deleteParameter
 } from '../controllers/parameterPanelController';
-import { getAllParametersClient } from '../controllers/parameterClientController';
+import { getAllParametersClient, getParameterByKeyClient } from '../controllers/parameterClientController';
 
 const router = express.Router();
 
 // Specific routes first so that /config and /key/:key are not treated as IDs
 // Mobile client routes (API token auth)
 router.get('/config', authenticateApiToken, getAllParametersClient);
-router.get('/config/:key', authenticateApiToken, getParameterByKey);
+router.get('/config/:key', authenticateApiToken, getParameterByKeyClient);
 
 // Panel routes(Firebase auth)
 router.get('/key/:key', authenticateFirebaseToken, getParameterByKey);

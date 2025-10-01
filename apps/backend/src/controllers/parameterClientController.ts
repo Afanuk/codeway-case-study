@@ -16,3 +16,18 @@ export const getAllParametersClient = async (req: Request, res: Response) => {
   }
 };
 
+// Get a parameter by its key for client applications
+export const getParameterByKeyClient = async (req: Request, res: Response) => {
+  const { key } = req.params;
+  console.log(`getParameterByKeyClient controller called with key: ${key}`);
+
+  try {
+    const parameter = await parameterClientService.getParameterByKeyClient(key);
+    if (!parameter) {
+      return sendError(res, 'Parameter not found', HttpStatusCode.NOT_FOUND, null);
+    }
+    sendSuccess(res, 'Parameter retrieved successfully', HttpStatusCode.OK, parameter);
+  } catch (error: any) {
+    sendError(res, 'Failed to retrieve parameter', HttpStatusCode.INTERNAL_SERVER_ERROR, error);
+  }
+};

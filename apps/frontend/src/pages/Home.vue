@@ -2,7 +2,7 @@
 import { useAuth } from '../composables/useAuth'
 import ParameterList from '../components/ParameterList.vue'
 
-const { user, isLoading } = useAuth()
+const { isLoading } = useAuth()
 </script>
 
 <template>

@@ -44,7 +44,7 @@ const toggleMode = () => {
   <div class="sign-in-page">
     <div class="sign-in-container">
       <div class="logo">
-        <img class="logo-icon" src="/src/assets/icon.png" alt="Logo" ></img>
+        <img onclick="window.location.href='https://www.codeway.co/'" class="logo-icon" src="/src/assets/icon.png" alt="Logo" ></img>
       </div>
       
       <h2>{{ isSignUp ? 'Create Account' : 'Please sign in' }}</h2>
@@ -124,6 +124,27 @@ const toggleMode = () => {
   margin: 0 auto;
   position: relative;
   max-width: 100%;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.logo-icon:hover {
+  animation: wave 2s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(0px);
+  }
+  75% {
+    transform: translateY(-4px);
+  }
 }
 
 

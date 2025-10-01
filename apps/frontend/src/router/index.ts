@@ -32,7 +32,8 @@ router.beforeEach(async (to, from, next) => {
     await new Promise(resolve => setTimeout(resolve, 50))
     attempts++
   }
-  
+
+  console.log('Navigating to:', to.fullPath, 'from:', from.fullPath, 'user:', user.value)
   // Check if route requires authentication
   if (to.meta.requiresAuth && !user.value) {
     // Redirect to redirect page, which will then redirect to SignIn

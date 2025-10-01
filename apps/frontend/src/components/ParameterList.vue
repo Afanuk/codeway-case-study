@@ -151,12 +151,12 @@
 import { IconUserFilled, IconCaretDownFilled, IconCaretDown } from '@tabler/icons-vue'
 import { ref, onMounted } from 'vue'
 import type { Parameter } from '../types/parameter'
-import { parameterService } from '../services/parameterService'
+import { parameterPanelService } from '../services/parameterPanelService'
 import { useAuth } from '../composables/useAuth'
 import { useRouter } from 'vue-router'
 import ParameterCard from './ParameterCard.vue'
 
-const { logout } = useAuth()
+const { user, logout } = useAuth()
 const router = useRouter()
 const parameters = ref<Parameter[]>([])
 const loading = ref(false)
@@ -176,15 +176,22 @@ const newParameter = ref({
   description: ''
 })
 
-const formatDate = (dateString: Date | undefined) => {
-  if (!dateString) return 'N/A'
-  return new Date(dateString).toLocaleDateString('en-GB', {
+const formatDate = (date: Date | undefined) => {
+  if (!date) return 'N/A'
+  
+  // Date should already be a proper Date object from service
+  const dateStr = date.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: '2-digit',
-    year: 'numeric',
+    year: 'numeric'
+  })
+  
+  const timeStr = date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit'
   })
+  
+  return `${dateStr} ${timeStr}`
 }
 
 const toggleSort = () => {
@@ -207,7 +214,7 @@ const sortParameters = () => {
 const loadParameters = async () => {
   try {
     loading.value = true
-    parameters.value = await parameterService.getAllParameters()
+    parameters.value = await parameterPanelService.getAllParametersPanel()
     sortParameters()
     sortParameters()
   } catch (error) {
@@ -224,7 +231,7 @@ const addParameter = async () => {
   }
 
   try {
-    await parameterService.createParameter(newParameter.value)
+    await parameterPanelService.createParameter(newParameter.value)
     newParameter.value = { parameterKey: '', value: '', description: '' }
     await loadParameters()
   } catch (error) {
@@ -255,8 +262,8 @@ const saveParameter = async () => {
       value: editForm.value.value,
       description: editForm.value.description
     }
-    
-    await parameterService.updateParameter(editingId.value!, updatedParameter)
+
+    await parameterPanelService.updateParameter(editingId.value!, updatedParameter)
     editingId.value = null
     editForm.value = { parameterKey: '', value: '', description: '' }
     await loadParameters()
@@ -277,7 +284,7 @@ const deleteParameter = async (parameter: Parameter) => {
   }
 
   try {
-    await parameterService.deleteParameter(parameter.id)
+    await parameterPanelService.deleteParameter(parameter.id)
     await loadParameters()
   } catch (error) {
     console.error('Error deleting parameter:', error)
@@ -380,16 +387,6 @@ onMounted(() => {
 
 .mobile-view {
   display: none;
-}
-
-@media (max-width: 50vh) {
-  .desktop-view {
-    display: none;
-  }
-  
-  .mobile-view {
-    display: block;
-  }
 }
 
 .table-container {
@@ -561,7 +558,7 @@ onMounted(() => {
   width: 94.5%;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 64em) {
   .form-row {
     flex-direction: column;
     gap: 0.5rem;
@@ -636,7 +633,7 @@ onMounted(() => {
   width: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48em) {
   .desktop-view {
     display: none;
   }

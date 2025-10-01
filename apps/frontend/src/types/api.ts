@@ -4,12 +4,13 @@ import type { Parameter } from './parameter';
 interface SuccessResponse<T> {
   success: boolean;          // Indicates if the request was successful
   message: string;           // Response message
-  data: T;                   // Response data of generic type T
   timestamp: string;         // Timestamp of the response
+  data: T;                   // Response data of generic type T
 }
 
 export type ParameterListResponse = SuccessResponse<Parameter[]>;
 export type ParameterResponse = SuccessResponse<Parameter>;
+export type ConfigResponse = SuccessResponse<JSON>;
 
 export interface ErrorResponse {
   success: boolean;          // Indicates if the request was successful

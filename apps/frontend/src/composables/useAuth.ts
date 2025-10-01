@@ -2,12 +2,12 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import type { User } from 'firebase/auth'
 import { onAuthStateChange, signIn, signUp, logOut } from '../firebase/auth'
 
-// ✅ SHARED STATE - Created once, used everywhere
+// global state - shared across all components using this composable
 const user = ref<User | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 
-// ✅ Initialize auth listener once
+// Initialize auth listener once
 let unsubscribe: (() => void) | null = null
 let isInitialized = false
 
@@ -23,8 +23,9 @@ const initializeAuth = () => {
   isInitialized = true
 }
 
-// ✅ Clean up when app unmounts
+// Cleanup function to unsubscribe from auth listener
 const cleanupAuth = () => {
+  console.log('Cleaning up auth listener...')
   if (unsubscribe) {
     unsubscribe()
     unsubscribe = null
@@ -63,6 +64,7 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
+    console.log('Attempting logout...')
     try {
       error.value = null
       await logOut()
@@ -71,7 +73,6 @@ export const useAuth = () => {
     }
   }
 
-  // ✅ Return the SAME shared state for all components
   return {
     user,
     isLoading,

@@ -18,3 +18,18 @@ export const getAllParametersClient = async () => {
 
   return JSONConfig;
 };
+
+// Get parameter by key
+export const getParameterByKeyClient = async (key: string) => {
+  const snapshot = await db.collection('parameters').where('parameterKey', '==', key).limit(1).get();
+  
+  if (snapshot.empty) {
+    return null;
+  }
+
+  const doc = snapshot.docs[0];
+  return {
+    parameterKey: doc.data().parameterKey,
+    value: doc.data().value,
+  };
+};
