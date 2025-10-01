@@ -47,30 +47,3 @@ export const sendError = (
 
   return res.status(statusCode).json(response);
 };
-
-/**
- * Send paginated response
- * @param res - Express response object
- * @param data - Response data array
- * @param pagination - Pagination metadata
- * @param message - Success message
- */
-export const sendPaginated = (
-  res: Response,
-  data: any[],
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  },
-  message = 'Success'
-) => {
-  return res.status(200).json({
-    success: true,
-    message,
-    data,
-    pagination,
-    timestamp: new Date().toISOString()
-  });
-};

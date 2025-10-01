@@ -11,11 +11,18 @@ export const createParameter = async (req: Request, res: Response) => {
   console.log('Request body:', JSON.stringify(req.body, null, 2));
   
   try {
-    const paramData: Omit<Parameter, 'id' | 'createdAt'> = req.body;
+    let { value, ...rest } = req.body;
+
+    // If value is not sent as a JSON object, transform old format to new format
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      value = { default: value };
+    }
+    
+    const paramData: Omit<Parameter, 'id' | 'createdAt'> = { ...rest, value };
     
     // Basic validation
-    if (!paramData.parameterKey || !paramData.value) {
-      return sendError(res, 'Parameter key and value are required', 400);
+    if (!paramData.parameterKey || !paramData.value || !paramData.value.default) {
+      return sendError(res, 'Parameter key and default value are required', HttpStatusCode.BAD_REQUEST, null);
     }
 
     // To track who created the parameter
@@ -40,16 +47,35 @@ export const updateParameter = async (req: Request, res: Response) => {
   
   try {
     const id = req.params.id;
-    const updates: Partial<Parameter> = req.body;
+    const country = req.query.country ? req.query.country.toString() : 'default';    
+    // Create updates object with the value for the specific country
+    const updates = req.body;      
+    console.log('Country query parameter:', country);
+    console.log('Updates:', JSON.stringify(updates, null, 2));
     
+    // Basic validation
     if (!id) {
-      return sendError(res, 'Parameter ID is required', 400);
+      return sendError(res, 'Parameter ID is required', HttpStatusCode.BAD_REQUEST, null);
     }
+    if (updates.parameterKey === ""  || updates.parameterKey === null) {
+      return sendError(res, 'Parameter key cannot be empty or null', HttpStatusCode.BAD_REQUEST, null);
+    }
+    if (req.body.value === "") {
+      return sendError(res, 'Value cannot be empty string', HttpStatusCode.BAD_REQUEST, null);
+    }
+    // Use this to delete country-specific configuration
+    if (updates.value === null){
+      console.log('Value is null, will delete country-specific configuration');
+    } 
+    
+    const updatesFormatted: Partial<Parameter> = {
+      ...req.body,
+      value: {
+        [country]: req.body.value
+      }  
+    };
 
-    // To track who updated the parameter
-    updates.updatedBy = req.user?.id; 
-
-    const updatedParam = await parameterService.updateParameter(id, updates);
+    const updatedParam = await parameterService.updateParameter(id, updatesFormatted, country);
     
     if (!updatedParam) {
       return sendError(res, 'Parameter not found', HttpStatusCode.NOT_FOUND, null);

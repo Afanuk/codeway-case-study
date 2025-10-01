@@ -26,10 +26,34 @@ export const createParameter = async (paramData: Partial<Parameter>) => {
 };
 
 // Update parameter
-export const updateParameter = async (id: string, updates: Partial<Parameter>) => {
+export const updateParameter = async (id: string, updates: Partial<Parameter>, country: string) => {
   // Add update timestamp
   updates.updatedAt = new Date();
   
+  // Fetch existing document
+  const existingDoc = await db.collection('parameters').doc(id).get();
+  if (!existingDoc.exists) {
+    throw new Error('Parameter not found');
+  }
+  const existingData = existingDoc.data() as Parameter;
+  
+  // If value being updated is null, delete that country's entry
+  if (updates.value && updates.value[country] === null) {
+    // Prevent deletion of default value
+    if (country === 'default') {
+      throw new Error('Cannot delete default value - it is required');
+    }
+    const newValue = { ...existingData.value };
+    delete newValue[country];
+    updates.value = newValue;
+  }
+  // Handle all country updates and also adding new country values
+  if (updates.value && updates.value[country] !== null) {
+    const newValue = { ...existingData.value };
+    newValue[country] = updates.value[country];
+    updates.value = newValue;
+  }
+
   // Update the document
   await db.collection('parameters').doc(id).update(updates);
   
