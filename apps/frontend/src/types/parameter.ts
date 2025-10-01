@@ -2,7 +2,10 @@
 export interface Parameter {
   id: string;               // Firestore document ID
   parameterKey: string;     // Unique key for the parameter
-  value: string;   // Value of the parameter
+  value: {                  // Value can be a default or country-specific
+    default: string | number | boolean;
+    [countryCode: string]: string | number | boolean;
+  };
   description?: string;     // Optional description
   createdAt?: Date;         // Timestamp of creation
   updatedAt?: Date;         // Timestamp of last update

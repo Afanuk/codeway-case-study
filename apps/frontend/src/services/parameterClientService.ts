@@ -8,8 +8,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000
 export const parameterClientService = {
 
   // Get all parameters for Mobile App
-  async getAllParametersClient(): Promise<JSON> {
-    const response = await fetch(`${API_BASE_URL}/parameters/config`, {
+  async getAllParametersClient(country: string): Promise<JSON> {
+    const response = await fetch(`${API_BASE_URL}/parameters/config?country=${country}`, {
       method: 'GET',
       headers: { 
         'X-API-Token': import.meta.env.VITE_MOBILE_API_TOKEN || 'default-mobile-api-token-2024',
@@ -31,8 +31,8 @@ export const parameterClientService = {
   },
 
   // Get a parameter by key for Mobile App
-  async getParameterByKey(key: string): Promise<Parameter> {
-    const response = await fetch(`${API_BASE_URL}/parameters/key/${key}`, {
+  async getParameterByKey(key: string, country: string): Promise<Parameter> {
+    const response = await fetch(`${API_BASE_URL}/parameters/config/${key}?country=${country}`, {
       method: 'GET',
       headers: { 
         'X-API-Token': import.meta.env.VITE_MOBILE_API_TOKEN || 'default-mobile-api-token-2024',

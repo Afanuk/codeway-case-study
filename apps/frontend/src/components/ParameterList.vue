@@ -45,45 +45,18 @@
           <tbody>
             <tr v-for="parameter in parameters" :key="parameter.id" class="parameter-row">
               <td class="key-cell">
-                <input 
-                  v-if="editingId === parameter.id" 
-                  v-model="editForm.parameterKey" 
-                  class="edit-input"
-                  @keyup.enter="saveParameter"
-                  @keyup.escape="cancelEdit"
-                />
-                <span v-else>{{ parameter.parameterKey }}</span>
+                <span>{{ parameter.parameterKey }}</span>
               </td>
               <td class="value-cell">
-                <input 
-                  v-if="editingId === parameter.id" 
-                  v-model="editForm.value" 
-                  class="edit-input"
-                  @keyup.enter="saveParameter"
-                  @keyup.escape="cancelEdit"
-                />
-                <span v-else>{{ parameter.value }}</span>
+                <span>{{ parameter.value.default }}</span>
               </td>
               <td class="description-cell">
-                <input 
-                  v-if="editingId === parameter.id" 
-                  v-model="editForm.description" 
-                  class="edit-input edit-input-wide"
-                  @keyup.enter="saveParameter"
-                  @keyup.escape="cancelEdit"
-                />
-                <span v-else>{{ parameter.description }}</span>
+                <span>{{ parameter.description }}</span>
               </td>
               <td class="date-cell">{{ formatDate(parameter.createdAt) }}</td>
               <td class="actions-cell">
-                <template v-if="editingId === parameter.id">
-                  <button @click="saveParameter" class="btn btn-edit">Save</button>
-                  <button @click="cancelEdit" class="btn btn-delete">Cancel</button>
-                </template>
-                <template v-else>
-                  <button @click="editParameter(parameter)" class="btn btn-edit">Edit</button>
-                  <button @click="deleteParameter(parameter)" class="btn btn-delete">Delete</button>
-                </template>
+                <button @click="editParameter(parameter)" class="btn btn-edit">Edit</button>
+                <button @click="deleteParameter(parameter)" class="btn btn-delete">Delete</button>
               </td>
             </tr>
           </tbody>
@@ -99,7 +72,7 @@
             class="form-input"
           />
           <input 
-            v-model="newParameter.value" 
+            v-model="newParameter.value.default" 
             placeholder="Value" 
             class="form-input"
           />
@@ -132,7 +105,7 @@
           class="form-input form-input-key"
         />
         <input 
-          v-model="newParameter.value" 
+          v-model="newParameter.value.default" 
           placeholder="Value" 
           class="form-input form-input-value"
         />
@@ -162,17 +135,10 @@ const parameters = ref<Parameter[]>([])
 const loading = ref(false)
 const sortDirection = ref<'asc' | 'desc'>('desc')
 const isDropdownOpen = ref(false)
-const editingId = ref<string | null>(null)
-
-const editForm = ref({
-  parameterKey: '',
-  value: '',
-  description: ''
-})
 
 const newParameter = ref({
   parameterKey: '',
-  value: '',
+  value: { default: '' },
   description: ''
 })
 
@@ -225,14 +191,14 @@ const loadParameters = async () => {
 }
 
 const addParameter = async () => {
-  if (!newParameter.value.parameterKey || !newParameter.value.value) {
+  if (!newParameter.value.parameterKey || !newParameter.value.value.default) {
     alert('Parameter key and value are required')
     return
   }
 
   try {
     await parameterPanelService.createParameter(newParameter.value)
-    newParameter.value = { parameterKey: '', value: '', description: '' }
+    newParameter.value = { parameterKey: '', value: { default: '' }, description: '' }
     await loadParameters()
   } catch (error) {
     console.error('Error adding parameter:', error)
@@ -241,41 +207,8 @@ const addParameter = async () => {
 }
 
 const editParameter = (parameter: Parameter) => {
-  editingId.value = parameter.id
-  editForm.value = {
-    parameterKey: parameter.parameterKey,
-    value: parameter.value,
-    description: parameter.description || ''
-  }
-}
-
-const saveParameter = async () => {
-  if (!editForm.value.parameterKey || !editForm.value.value) {
-    alert('Parameter key and value are required')
-    return
-  }
-
-  try {
-    const updatedParameter = {
-      id: editingId.value!,
-      parameterKey: editForm.value.parameterKey,
-      value: editForm.value.value,
-      description: editForm.value.description
-    }
-
-    await parameterPanelService.updateParameter(editingId.value!, updatedParameter)
-    editingId.value = null
-    editForm.value = { parameterKey: '', value: '', description: '' }
-    await loadParameters()
-  } catch (error) {
-    console.error('Error updating parameter:', error)
-    alert('Failed to update parameter')
-  }
-}
-
-const cancelEdit = () => {
-  editingId.value = null
-  editForm.value = { parameterKey: '', value: '', description: '' }
+  // Navigate to an edit page or open a modal (not implemented here)
+  alert(`Edit functionality for "${parameter.parameterKey}" is not implemented yet.`)
 }
 
 const deleteParameter = async (parameter: Parameter) => {
