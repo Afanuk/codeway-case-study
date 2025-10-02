@@ -86,9 +86,9 @@ codeway-case-study/
    ```
 
 5. **Access the application**
-   - Admin Panel: http://localhost:5173
-   - API Server: http://localhost:4000
-   - API Documentation: http://localhost:4000/api
+   - Admin Panel: https://codeway-case-study-ochre.vercel.app/
+   - API Server: https://codeway-casestudy-176397680079.europe-west4.run.app
+   - API Documentation: https://codeway-casestudy-176397680079.europe-west4.run.app/api
 
 ## 📚 API Documentation
 
