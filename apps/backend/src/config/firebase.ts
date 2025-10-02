@@ -6,11 +6,16 @@ import { getAuth } from 'firebase-admin/auth';
 // Initialize Firebase Admin SDK
 let app;
 if (getApps().length === 0) {
+  // Support both local (.env) and Google Cloud (with _prefix) environment variables
+  const projectId = process.env._FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
+  const privateKey = process.env._FIREBASE_PRIVATE_KEY || process.env.FIREBASE_PRIVATE_KEY;
+  const clientEmail = process.env._FIREBASE_CLIENT_EMAIL || process.env.FIREBASE_CLIENT_EMAIL;
+
   app = initializeApp({
     credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      projectId: projectId,
+      privateKey: privateKey?.replace(/\\n/g, '\n'), // Handle escaped newlines
+      clientEmail: clientEmail,
     } as ServiceAccount),
   });
   console.log('Firebase Admin SDK initialized');
