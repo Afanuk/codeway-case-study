@@ -11,6 +11,30 @@ if (getApps().length === 0) {
   const privateKey = process.env._FIREBASE_PRIVATE_KEY || process.env.FIREBASE_PRIVATE_KEY;
   const clientEmail = process.env._FIREBASE_CLIENT_EMAIL || process.env.FIREBASE_CLIENT_EMAIL;
 
+  // Debug logging
+  console.log('=== Firebase Configuration Debug ===');
+  console.log('Environment variables check:');
+  console.log('_FIREBASE_PROJECT_ID:', process.env._FIREBASE_PROJECT_ID);
+  console.log('FIREBASE_PROJECT_ID:', process.env.FIREBASE_PROJECT_ID);
+  console.log('Resolved projectId:', projectId);
+  console.log('_FIREBASE_CLIENT_EMAIL:', process.env._FIREBASE_CLIENT_EMAIL);
+  console.log('FIREBASE_CLIENT_EMAIL:', process.env.FIREBASE_CLIENT_EMAIL);
+  console.log('Resolved clientEmail:', clientEmail);
+  console.log('_FIREBASE_PRIVATE_KEY exists:', !!process.env._FIREBASE_PRIVATE_KEY);
+  console.log('FIREBASE_PRIVATE_KEY exists:', !!process.env.FIREBASE_PRIVATE_KEY);
+  console.log('Resolved privateKey exists:', !!privateKey);
+  console.log('=== End Debug ===');
+
+  if (!projectId) {
+    throw new Error('Firebase projectId is missing. Check _FIREBASE_PROJECT_ID or FIREBASE_PROJECT_ID environment variable.');
+  }
+  if (!privateKey) {
+    throw new Error('Firebase privateKey is missing. Check _FIREBASE_PRIVATE_KEY or FIREBASE_PRIVATE_KEY environment variable.');
+  }
+  if (!clientEmail) {
+    throw new Error('Firebase clientEmail is missing. Check _FIREBASE_CLIENT_EMAIL or FIREBASE_CLIENT_EMAIL environment variable.');
+  }
+
   app = initializeApp({
     credential: cert({
       projectId: projectId,
