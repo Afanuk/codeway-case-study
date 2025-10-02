@@ -42,12 +42,12 @@ export const parameterPanelService = {
   },
 
   // Update an existing parameter
-  async updateParameter(id: string, updates: Partial<Parameter>): Promise<Parameter> {
+  async updateParameter(id: string, updates: any, country: string): Promise<Parameter> {
     // Get fresh token for each request
     const token = await user.value?.getIdToken();
 
     // Send PUT request to update parameter
-    const response = await fetch(`${API_BASE_URL}/parameters/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/parameters/${id}?country=${country}`, {
       method: 'PUT',
       headers: { 
         'Authorization': `Bearer ${token}`,

@@ -8,7 +8,7 @@
         </div>
         <div class="info-item">
           <span class="label">Value:</span>
-          <span class="value">{{ parameter.value }}</span>
+          <span class="value">{{ parameter.value.default }}</span>
         </div>
         <div class="info-item">
           <span class="label">Description:</span>
