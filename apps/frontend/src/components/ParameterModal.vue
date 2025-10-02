@@ -37,7 +37,7 @@
           <div class="country-values">
             <div v-for="(value, country) in countryValues" :key="country" class="country-item">
               <span class="country-code">{{ country.toUpperCase() }}:</span>
-              <input v-model="countryValues[country]" type="text" class="country-input"/>
+              <input v-model="localParameter.value[country]" type="text" class="country-input"/>
               <button @click="removeCountry(country)" class="btn-remove">×</button>
             </div>
           </div>
