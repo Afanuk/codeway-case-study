@@ -117,17 +117,26 @@
         <button @click="addParameter" class="btn btn-add">ADD</button>
       </div>
     </div>
+
+    <!-- Parameter Modal -->
+    <ParameterModal 
+      :visible="showModal" 
+      :parameter="editingParameter" 
+      @close="closeModal" 
+      @save="saveChanges" 
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { IconUserFilled, IconCaretDownFilled, IconCaretDown } from '@tabler/icons-vue'
+import { IconUserFilled, IconCaretDownFilled } from '@tabler/icons-vue'
 import { ref, onMounted } from 'vue'
 import type { Parameter } from '../types/parameter'
 import { parameterPanelService } from '../services/parameterPanelService'
 import { useAuth } from '../composables/useAuth'
 import { useRouter } from 'vue-router'
 import ParameterCard from './ParameterCard.vue'
+import ParameterModal from './ParameterModal.vue'
 
 const { user, logout } = useAuth()
 const router = useRouter()
@@ -141,6 +150,10 @@ const newParameter = ref({
   value: { default: '' },
   description: ''
 })
+
+// Modal related variables
+const showModal = ref(false)
+const editingParameter = ref<Parameter | null>(null)
 
 const formatDate = (date: Date | undefined) => {
   if (!date) return 'N/A'
@@ -182,7 +195,6 @@ const loadParameters = async () => {
     loading.value = true
     parameters.value = await parameterPanelService.getAllParametersPanel()
     sortParameters()
-    sortParameters()
   } catch (error) {
     console.error('Error loading parameters:', error)
   } finally {
@@ -207,8 +219,72 @@ const addParameter = async () => {
 }
 
 const editParameter = (parameter: Parameter) => {
-  // Navigate to an edit page or open a modal (not implemented here)
-  alert(`Edit functionality for "${parameter.parameterKey}" is not implemented yet.`)
+  editingParameter.value = {
+    id: parameter.id || '',
+    parameterKey: parameter.parameterKey || '',
+    value: { ...(parameter.value || { default: '' }) }, // Not to give reference
+    description: parameter.description || ''
+  }
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+  editingParameter.value = null
+}
+
+const saveChanges = async(updatedParameter: Parameter) => {
+  try {
+    // Fetch the latest data from the server to check for conflicts
+    const lastVersion = await parameterPanelService.getParameterById(updatedParameter.id)
+
+    console.log('Last version from server:', lastVersion)
+    console.log('Updated version to save:', updatedParameter)
+
+    // Check and update parameterKey
+    if(lastVersion.parameterKey !== updatedParameter.parameterKey) {
+      console.log(`Parameter Key changed from "${lastVersion.parameterKey}" to "${updatedParameter.parameterKey}"`)
+      const payload = { parameterKey: updatedParameter.parameterKey }
+      await parameterPanelService.updateParameter(updatedParameter.id, payload, "default")    
+    }
+
+    // Check and update description
+    if(lastVersion.description !== updatedParameter.description) {
+      console.log(`Description changed from "${lastVersion.description}" to "${updatedParameter.description}"`)
+      const payload = { description: updatedParameter.description }
+      await parameterPanelService.updateParameter(updatedParameter.id, payload, "default")    
+    }
+
+    // Check for new and updated value fields (exist in updatedParameter but not in lastVersion)
+    for(const [key, value] of Object.entries(updatedParameter.value || {})) {
+      console.log('Checking value for key:', key, 'with value:', value)
+      if(value !== lastVersion.value[key]) {
+        console.log(`Value for key "${key}" changed from "${lastVersion.value[key]}" to "${value}"`)
+        const payload = { value: value }
+        await parameterPanelService.updateParameter(updatedParameter.id, payload, key)    
+      }
+    }
+
+    // Check for deleted countries (exist in lastVersion but not in updatedParameter)
+    for(const [key, value] of Object.entries(lastVersion.value || {})) {
+      // Skip 'default' as it should never be deleted
+      if(key !== 'default' && !(key in (updatedParameter.value || {}))) {
+        console.log(`Country "${key}" was deleted, sending null to remove it`)
+        const payload = { value: null }
+        await parameterPanelService.updateParameter(updatedParameter.id, payload, key)    
+      }
+    }
+
+    // Refresh the parameter list to reflect all changes
+    closeModal()
+    await loadParameters()
+    console.log('All parameter changes saved successfully')
+
+  } catch (error) {
+    console.error('Error saving parameter changes:', error)
+    alert('Failed to save changes. Please try again.')
+    // Keep modal open so user can retry
+  }
 }
 
 const deleteParameter = async (parameter: Parameter) => {
@@ -394,7 +470,7 @@ onMounted(() => {
 }
 
 .btn {
-  padding: 0.3rem 1rem;
+  padding: 0;
   border: none;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -406,7 +482,8 @@ onMounted(() => {
 .btn-edit {
   background: linear-gradient(270deg, #4f7fe7 0%, #2563eb 100%);
   color: white;
-  min-width: 60px;
+  width: 3.5rem;
+  height: 2rem;
 }
 
 .btn-edit:hover {
@@ -416,7 +493,8 @@ onMounted(() => {
 .btn-delete {
   background: linear-gradient(270deg, #f75c5c 0%, #c03434 100%);
   color: white;
-  min-width: 60px;
+  width: 5rem;
+  height: 2rem;
 }
 
 .btn-delete:hover {
@@ -427,8 +505,8 @@ onMounted(() => {
   background: linear-gradient(270deg, #13ceb5 0%, #07706b 100%);
   color: white;
   font-weight: 600;
-  margin-right: 6.5rem;
-  margin-left: 1rem;
+  margin-right: 6.75rem;
+  margin-left: 0.75rem;
   max-width: 3.5rem;
   width: 4.5rem;
   height: 2rem;
@@ -437,47 +515,6 @@ onMounted(() => {
 
 .btn-add:hover {
   background: linear-gradient(270deg, #07706b 0%, #035753 100%);
-}
-
-.btn-save {
-  background: linear-gradient(270deg, #22c55e 0%, #16a34a 100%);
-  color: white;
-  min-width: 60px;
-}
-
-.btn-save:hover {
-  background: linear-gradient(270deg, #16a34a 0%, #15803d 100%);
-}
-
-.btn-cancel {
-  background: linear-gradient(270deg, #6b7280 0%, #4b5563 100%);
-  color: white;
-  min-width: 60px;
-}
-
-.btn-cancel:hover {
-  background: linear-gradient(270deg, #4b5563 0%, #374151 100%);
-}
-
-.edit-input {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 4px;
-  padding: 0.4rem;
-  color: #ffffff;
-  font-size: 0.875rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.edit-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 1px #3b82f6;
-}
-
-.edit-input-wide {
-  min-width: 200px;
 }
 
 .add-form {

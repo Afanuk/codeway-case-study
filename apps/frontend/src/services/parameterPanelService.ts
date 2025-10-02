@@ -42,7 +42,7 @@ export const parameterPanelService = {
   },
 
   // Update an existing parameter
-  async updateParameter(id: string, updates: Partial<Parameter>, country: string): Promise<Parameter> {
+  async updateParameter(id: string, updates: any, country: string): Promise<Parameter> {
     // Get fresh token for each request
     const token = await user.value?.getIdToken();
 

@@ -7,6 +7,8 @@ export interface Parameter {
     [countryCode: string]: string | number | boolean;
   };
   description?: string;     // Optional description
+  createdBy?: string;       // User ID of the creator
+  updatedBy?: string;       // User ID of the last updater
   createdAt?: Date;         // Timestamp of creation
   updatedAt?: Date;         // Timestamp of last update
 }

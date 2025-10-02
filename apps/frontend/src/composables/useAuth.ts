@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import type { User } from 'firebase/auth'
 import { onAuthStateChange, signIn, signUp, logOut } from '../firebase/auth'
 

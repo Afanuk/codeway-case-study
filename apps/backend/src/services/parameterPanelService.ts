@@ -29,6 +29,7 @@ export const createParameter = async (paramData: Partial<Parameter>) => {
 export const updateParameter = async (id: string, updates: Partial<Parameter>, country: string) => {
   // Add update timestamp
   updates.updatedAt = new Date();
+  console.log('Updates object in service:', updates);
   
   // Fetch existing document
   const existingDoc = await db.collection('parameters').doc(id).get();
@@ -36,22 +37,28 @@ export const updateParameter = async (id: string, updates: Partial<Parameter>, c
     throw new Error('Parameter not found');
   }
   const existingData = existingDoc.data() as Parameter;
-  
+  console.log('Existing parameter data:', existingData);
+
+
   // If value being updated is null, delete that country's entry
   if (updates.value && updates.value[country] === null) {
+    console.log('Deleting country-specific configuration for country:', country);
     // Prevent deletion of default value
     if (country === 'default') {
+      console.log('Attempted to delete default value, which is not allowed');
       throw new Error('Cannot delete default value - it is required');
     }
     const newValue = { ...existingData.value };
     delete newValue[country];
     updates.value = newValue;
+    console.log('Updated value after deletion:', updates.value);
   }
   // Handle all country updates and also adding new country values
-  if (updates.value && updates.value[country] !== null) {
+  if (updates.value && updates.value[country] !== null && updates.value[country] !== undefined ) {
     const newValue = { ...existingData.value };
     newValue[country] = updates.value[country];
     updates.value = newValue;
+    console.log('Updated value after addition/update:', updates.value);
   }
 
   // Update the document

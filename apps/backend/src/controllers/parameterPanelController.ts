@@ -68,13 +68,22 @@ export const updateParameter = async (req: Request, res: Response) => {
       console.log('Value is null, will delete country-specific configuration');
     } 
     
-    const updatesFormatted: Partial<Parameter> = {
-      ...req.body,
-      value: {
-        [country]: req.body.value
-      }  
-    };
+    let updatesFormatted: Partial<Parameter> = {};
 
+    if ( updates.value === undefined ) {
+      // If value is not being updated, just copy other fields
+      updatesFormatted = { ...updates };
+    } else {
+      // If value is sent with country keys, use it directly
+      updatesFormatted = {
+        ...updates,
+        value: {
+          [country]: updates.value
+        }  
+      };
+    }
+
+    console.log('Formatted updates:', JSON.stringify(updatesFormatted, null, 2));
     const updatedParam = await parameterService.updateParameter(id, updatesFormatted, country);
     
     if (!updatedParam) {
