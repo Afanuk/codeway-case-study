@@ -182,12 +182,12 @@ Update environment variables for production:
 
 **Backend Production:**
 - `NODE_ENV=production`
-- `FRONTEND_URL=https://your-frontend-domain.com`
+- `FRONTEND_URL=https://codeway-case-study-ochre.vercel.app`
 - Use production Firebase credentials
 
 **Frontend Production:**
 - `NODE_ENV=production`
-- `VITE_API_BASE_URL=https://your-backend-domain.com/api`
+- `VITE_API_BASE_URL=https://codeway-casestudy-176397680079.europe-west4.run.app`
 - Use production Firebase configuration
 
 ## 🧪 Testing
